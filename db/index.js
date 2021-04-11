@@ -1,6 +1,39 @@
 const {Hotel,user_account_pwd,home_advertisement,adcode_moreinfo,
-  user_lived_record,user_fav_record} = require('./model/hotels')
+  user_lived_record,user_fav_record,hotel_room,room_state} = require('./model/hotels')
 const {Op} = require('sequelize')
+//room_state.hasOne(hotel_room,{foreignKey:'hotelId',sourceKey:'hotelId'},{foreignKey:'eid',sourceKey:'eid'})
+//以下是对room_state表进行操作(获取某个酒店某个房间指定日期的数据)
+async function room_state_getRoomInfoByHotelIdEidDate(hotelId,eid,sdate,edate) {
+  return room_stat.findOne({
+    attributes: ['hotelId','eid','remaining','state','price'],
+    //include:[hotel_room],
+    where:{
+      hotelId:hotelId,
+      eid:eid,
+      sdate:sdate,
+      edate:edate
+    },
+    order:[
+      ['eid', 'DESC']
+    ]
+  })
+}
+
+
+//以下是对hotel_room表进行操作(获取某个酒店所有房间的信息)
+async function hotel_room_getAllRoomByHotelId(hotelId) {
+  return hotel_room.findAll({
+    attributes: ['hotelId','eid','types','photo1','photo2','photo3','photo4',
+    'count','desc','beddesc','roomarea','floordesc','windowdesc','internetdesc',
+    'smokedesc','peopledesc','desc','breakfast'],
+    where:{
+      hotelId:hotelId
+    },
+    order:[
+      ['hotelId', 'DESC']
+    ]
+  })
+}
 
 //以下是对user_lived_record表进行操作
 async function user_lived_record_getAllByUserId(userId) {
@@ -173,4 +206,8 @@ module.exports = {
 
   getLivedHotelsByUserID,
   getFavHotelsByUserID,
+
+  hotel_room_getAllRoomByHotelId,
+
+  room_state_getRoomInfoByHotelIdEidDate,
 }

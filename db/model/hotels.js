@@ -183,6 +183,117 @@ const user_fav_record = sequelize.define('user_fav_record', {
 })
 user_fav_record.sync();
 
+//读取hotel_room表
+const hotel_room = sequelize.define('hotel_room', {
+  hotelId: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  eid: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  types: {
+    type: Sequelize.STRING,
+  },
+  photo1: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  photo2: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  photo3: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  photo4: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  count: {
+    allowNull:false,
+    type: Sequelize.INTEGER,
+  },
+  desc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  beddesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  roomarea: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  floordesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  windowdesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  internetdesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  smokedesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  peopledesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  breakfast: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+},{
+  timestamps: false,
+  freezeTableName: true
+})
+hotel_room.sync();
+
+//读取room_state表
+const room_state = sequelize.define('room_state', {
+  hotelId: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  eid: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  sdate: {
+    allowNull:true,
+    type: Sequelize.DATE,
+  },
+  edate: {
+    allowNull:true,
+    type: Sequelize.DATE,
+  },
+  remaining: {
+    allowNull:true,
+    type: Sequelize.DATE,
+  },
+  state: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  price: {
+    allowNull:true,
+    type: Sequelize.INTEGER,
+  },
+},{
+  timestamps: false,
+  freezeTableName: true
+})
+room_state.sync();
+
 
 
 module.exports = {
@@ -191,5 +302,7 @@ module.exports = {
   home_advertisement,
   adcode_moreinfo,
   user_lived_record,
-  user_fav_record
+  user_fav_record,
+  hotel_room,
+  room_state,
 }
