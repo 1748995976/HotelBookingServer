@@ -239,6 +239,10 @@ const hotel_room = sequelize.define('hotel_room', {
     allowNull:true,
     type: Sequelize.STRING,
   },
+  wifidesc: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
   internetdesc: {
     allowNull:true,
     type: Sequelize.STRING,
@@ -252,6 +256,38 @@ const hotel_room = sequelize.define('hotel_room', {
     type: Sequelize.STRING,
   },
   breakfast: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  beddetail: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  costpolicy: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  easyfacility: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  mediatech: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  bathroommatch: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  fooddrink: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  outerdoor: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  otherfacility: {
     allowNull:true,
     type: Sequelize.STRING,
   },

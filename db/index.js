@@ -24,8 +24,9 @@ async function room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate) {
 async function hotel_room_getAllRoomByHotelId(hotelId) {
   return hotel_room.findAll({
     attributes: ['hotelId','eid','types','roomname','photo1','photo2','photo3','photo4',
-    'count','desc','beddesc','roomarea','floordesc','windowdesc','internetdesc',
-    'smokedesc','peopledesc','desc','breakfast'],
+    'count','desc','beddesc','roomarea','floordesc','windowdesc','wifidesc','internetdesc',
+    'smokedesc','peopledesc','desc','breakfast','beddetail','costpolicy','easyfacility',
+    'mediatech','bathroommatch','fooddrink','outerdoor','otherfacility'],
     where:{
       hotelId:hotelId
     },
