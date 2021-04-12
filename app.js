@@ -9,7 +9,7 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   user_lived_record_getAllByUserId,
   getLivedHotelsByUserID,getFavHotelsByUserID,
   hotel_room_getAllRoomByHotelId,
-  room_state_getRoomInfoByHotelIdEidDate} = require('./db')
+  room_state_getRoomInfoByHotelIdDate} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
 //以下是自己添加的
@@ -18,20 +18,23 @@ const fs = require('fs');
 const mime = require('mime-types')
 const https = require("https")
 const http = require("http")
+const moment = require('moment')
 //广告所在的绝对路径
 const errorImgPath = "D:\\HotelBookingImages\\error.jpg"
 const adPath = "D:\\HotelBookingImages\\advertisement\\"
 //酒店图片所在的绝对路径
 const hotelsImg = "D:\\HotelBookingImages\\hotels\\"
-//获取某个酒店某个房间指定日期的数据
+//获取指定酒店指定房间指定日期的数据
 router.get('/room_state/getRoomInfoByHotelIdEidDate/:hotelId/:eid/:sdate/:edate', async (context) => {
   const hotelId = context.params.hotelId
   const eid = context.params.eid
   const sdate = context.params.sdate
   const edate = context.params.edate
-  var result = await room_state_getRoomInfoByHotelIdEidDate(hotelId,eid,sdate,edate)
+  console.log(eid + " " + sdate + " " + edate + "**********")
+  var result = await room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate)
 
   context.type = jsonMIME
+  
   context.body = {
     status: 0,
     data: result

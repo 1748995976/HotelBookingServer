@@ -196,6 +196,9 @@ const hotel_room = sequelize.define('hotel_room', {
   types: {
     type: Sequelize.STRING,
   },
+  roomname: {
+    type: Sequelize.STRING,
+  },
   photo1: {
     allowNull:true,
     type: Sequelize.STRING,
@@ -270,15 +273,15 @@ const room_state = sequelize.define('room_state', {
   },
   sdate: {
     allowNull:true,
-    type: Sequelize.DATE,
+    type: Sequelize.DATEONLY,
   },
   edate: {
     allowNull:true,
-    type: Sequelize.DATE,
+    type: Sequelize.DATEONLY,
   },
   remaining: {
     allowNull:true,
-    type: Sequelize.DATE,
+    type: Sequelize.INTEGER,
   },
   state: {
     allowNull:true,
