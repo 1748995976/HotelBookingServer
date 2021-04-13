@@ -333,6 +333,79 @@ const room_state = sequelize.define('room_state', {
 })
 room_state.sync();
 
+//读取hotel_service表
+const hotel_service = sequelize.define('hotel_service', {
+  hotelId: {
+    type: Sequelize.STRING,
+    unique: true,
+    primaryKey: true,
+  },
+  servicetitle_1: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  servicepre_1: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  servicetitle_2: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  servicepre_2: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  servicetitle_3: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  servicepre_3: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  canceltitle: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  cancelpolicy: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  childlivein: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  addbed: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  userule_1: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  userule_2: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  userule_3: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  roomtypedesc_1: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  roomtypedesc_2: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+},{
+  timestamps: false,
+  freezeTableName: true
+})
+hotel_service.sync();
+
 
 
 module.exports = {
@@ -344,4 +417,5 @@ module.exports = {
   user_fav_record,
   hotel_room,
   room_state,
+  hotel_service,
 }

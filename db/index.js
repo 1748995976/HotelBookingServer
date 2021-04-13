@@ -1,7 +1,21 @@
 const {Hotel,user_account_pwd,home_advertisement,adcode_moreinfo,
-  user_lived_record,user_fav_record,hotel_room,room_state} = require('./model/hotels')
+  user_lived_record,user_fav_record,hotel_room,room_state,hotel_service} = require('./model/hotels')
 const {Op} = require('sequelize')
 const moment = require('moment')
+//以下是对hotel_service表进行操作(获取指定酒店的服务)
+async function hotel_service_getServiceByHotelId(hotelId) {
+  return hotel_service.findOne({
+    attributes: ['hotelId','servicetitle_1','servicepre_1','servicetitle_2','servicepre_2',
+    'servicetitle_3','servicepre_3','canceltitle','cancelpolicy','childlivein','addbed',
+    'userule_1','userule_2','userule_3','roomtypedesc_1','roomtypedesc_2'],
+    where:{
+      hotelId:hotelId,
+    },
+    order:[
+      ['hotelId', 'DESC']
+    ]
+  })
+}
 
 //以下是对room_state表进行操作(获取某个酒店指定日期的所有房间的部分数据)
 async function room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate) {
@@ -211,4 +225,6 @@ module.exports = {
   hotel_room_getAllRoomByHotelId,
 
   room_state_getRoomInfoByHotelIdDate,
+
+  hotel_service_getServiceByHotelId,
 }
