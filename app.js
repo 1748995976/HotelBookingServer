@@ -38,7 +38,7 @@ router.get('/hotel_service/getServiceByHotelId/:hotelId', async (context) => {
   }
 })
 
-//获取指定酒店指定房间指定日期的数据
+//获取指定酒店指定房间 包含 指定日期的数据
 router.get('/room_state/getRoomInfoByHotelIdEidDate/:hotelId/:eid/:sdate/:edate', async (context) => {
   const hotelId = context.params.hotelId
   const eid = context.params.eid

@@ -17,15 +17,19 @@ async function hotel_service_getServiceByHotelId(hotelId) {
   })
 }
 
-//以下是对room_state表进行操作(获取某个酒店指定日期的所有房间的部分数据)
+//以下是对room_state表进行操作(获取某个酒店 包含 指定日期的所有房间的部分数据)
 async function room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate) {
   return room_state.findAll({
     attributes: ['hotelId','eid','sdate','edate','remaining','state','price'],
     where:{
       hotelId:hotelId,
       eid:eid,
-      sdate:sdate,
-      edate:edate
+      sdate:{
+        [Op.lte]:sdate
+      },
+      edate:{
+        [Op.gte]:edate,
+      }
     },
     order:[
       ['eid', 'DESC']
