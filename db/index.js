@@ -1,7 +1,21 @@
 const {Hotel,user_account_pwd,home_advertisement,adcode_moreinfo,
-  user_lived_record,user_fav_record,hotel_room,room_state,hotel_service} = require('./model/hotels')
+  user_lived_record,user_fav_record,hotel_room,room_state,hotel_service,
+  user_history_order} = require('./model/hotels')
 const {Op} = require('sequelize')
 const moment = require('moment')
+//以下是对user_history_order表进行操作(获取用户的订单历史)
+async function user_history_order_getHistoryOrderByAccount(account) {
+  return user_history_order.findAll({
+    attributes: ['account','hotelId','eid','number','totalPrice','sdate','edate','orderState'],
+    where:{
+      account:account,
+    },
+    order:[
+      ['sdate', 'DESC']
+    ]
+  })
+}
+
 //以下是对hotel_service表进行操作(获取指定酒店的服务)
 async function hotel_service_getServiceByHotelId(hotelId) {
   return hotel_service.findOne({
@@ -36,8 +50,22 @@ async function room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate) {
     ]
   })
 }
-
-
+//以下是对hotel_room表进行操作(获取某个酒店指定房间的信息)
+async function hotel_room_getRoomByHotelIdEid(hotelId,eid) {
+  return hotel_room.findOne({
+    attributes: ['hotelId','eid','types','roomname','photo1','photo2','photo3','photo4',
+    'count','desc','beddesc','roomarea','floordesc','windowdesc','wifidesc','internetdesc',
+    'smokedesc','peopledesc','desc','breakfast','beddetail','costpolicy','easyfacility',
+    'mediatech','bathroommatch','fooddrink','outerdoor','otherfacility'],
+    where:{
+      hotelId:hotelId,
+      eid:eid,
+    },
+    order:[
+      ['hotelId', 'DESC']
+    ]
+  })
+}
 //以下是对hotel_room表进行操作(获取某个酒店所有房间的信息)
 async function hotel_room_getAllRoomByHotelId(hotelId) {
   return hotel_room.findAll({
@@ -226,9 +254,12 @@ module.exports = {
   getLivedHotelsByUserID,
   getFavHotelsByUserID,
 
+  hotel_room_getRoomByHotelIdEid,
   hotel_room_getAllRoomByHotelId,
 
   room_state_getRoomInfoByHotelIdDate,
 
   hotel_service_getServiceByHotelId,
+
+  user_history_order_getHistoryOrderByAccount
 }

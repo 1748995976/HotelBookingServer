@@ -8,9 +8,10 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   adcode_moreinfo_getAllByAdcode,
   user_lived_record_getAllByUserId,
   getLivedHotelsByUserID,getFavHotelsByUserID,
-  hotel_room_getAllRoomByHotelId,
+  hotel_room_getRoomByHotelIdEid,hotel_room_getAllRoomByHotelId,
   room_state_getRoomInfoByHotelIdDate,
-  hotel_service_getServiceByHotelId} = require('./db')
+  hotel_service_getServiceByHotelId,
+  user_history_order_getHistoryOrderByAccount} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
 //以下是自己添加的
@@ -25,6 +26,18 @@ const errorImgPath = "D:\\HotelBookingImages\\error.jpg"
 const adPath = "D:\\HotelBookingImages\\advertisement\\"
 //酒店图片所在的绝对路径
 const hotelsImg = "D:\\HotelBookingImages\\hotels\\"
+
+//获取指定用户的历史订单记录
+router.get('/user_history_order/getHistoryOrderByAccount/:account', async (context) => {
+  const account = context.params.account
+  var result = await user_history_order_getHistoryOrderByAccount(account)
+  context.type = jsonMIME
+  
+  context.body = {
+    status: 0,
+    data: result
+  }
+})
 
 //获取指定酒店的服务政策
 router.get('/hotel_service/getServiceByHotelId/:hotelId', async (context) => {
@@ -48,6 +61,18 @@ router.get('/room_state/getRoomInfoByHotelIdEidDate/:hotelId/:eid/:sdate/:edate'
 
   context.type = jsonMIME
   
+  context.body = {
+    status: 0,
+    data: result
+  }
+})
+//用户获取某个酒店某个房间的信息
+router.get('/hotel_room/getRoomByHotelIdEid/:hotelId/:eid', async (context) => {
+  const hotelId = context.params.hotelId
+  const eid = context.params.eid
+  var result = await hotel_room_getRoomByHotelIdEid(hotelId,eid)
+
+  context.type = jsonMIME
   context.body = {
     status: 0,
     data: result

@@ -405,6 +405,45 @@ const hotel_service = sequelize.define('hotel_service', {
   freezeTableName: true
 })
 hotel_service.sync();
+//读取user_history_order表
+const user_history_order = sequelize.define('user_history_order', {
+  account: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  hotelId: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  eid: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  number: {
+    allowNull:true,
+    type: Sequelize.INTEGER,
+  },
+  totalPrice: {
+    allowNull:true,
+    type: Sequelize.INTEGER,
+  },
+  sdate: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  edate: {
+    allowNull:true,
+    type: Sequelize.DATEONLY,
+  },
+  orderState: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+},{
+  timestamps: false,
+  freezeTableName: true
+})
+user_history_order.sync();
 
 
 
@@ -418,4 +457,5 @@ module.exports = {
   hotel_room,
   room_state,
   hotel_service,
+  user_history_order,
 }
