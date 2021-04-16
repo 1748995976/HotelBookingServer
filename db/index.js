@@ -5,12 +5,18 @@ const {Op} = require('sequelize')
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { min } = require('moment')
-//以下是对user_history_order表进行操作(获取用户的订单历史)
+//用户订单失效时间，用户当前是否可以删除订单，订单状态的更改等等，需要好好考虑
+//以下是对user_history_order表进行操作(修改用户的订单记录，修改订单的状态)
+//以下是对user_history_order表进行操作(表面上删除用户的订单记录)
+//以下是对user_history_order表进行操作(增加用户的订单记录)
+//以下是对user_history_order表进行操作(获取用户的订单历史，只获取用户可以看到的,isShow字段不可见)
 async function user_history_order_getHistoryOrderByAccount(account) {
   return user_history_order.findAll({
-    attributes: ['account','hotelId','eid','number','totalPrice','sdate','edate','orderState'],
+    attributes: ['account','hotelId','eid','number','totalPrice','sdate','edate',
+    'orderState','customerName','customerPhone','arriveTime'],
     where:{
       account:account,
+      isShow:1,
     },
     order:[
       ['sdate', 'DESC']

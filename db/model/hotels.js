@@ -323,10 +323,6 @@ const room_state = sequelize.define('room_state', {
     allowNull:false,
     type: Sequelize.INTEGER,
   },
-  isShow: {
-    allowNull:false,
-    type: Sequelize.INTEGER,
-  }
 },{
   timestamps: false,
   freezeTableName: true
@@ -442,6 +438,22 @@ const user_history_order = sequelize.define('user_history_order', {
   orderState: {
     allowNull:false,
     type: Sequelize.STRING,
+  },
+  customerName: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  customerPhone: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  arriveTime: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  isShow: {
+    allowNull:false,
+    type: Sequelize.INTEGER,
   },
 },{
   timestamps: false,
