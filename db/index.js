@@ -20,7 +20,7 @@ async function user_history_order_getHistoryOrderByAccount(account) {
 async function hotel_service_getServiceByHotelId(hotelId) {
   return hotel_service.findOne({
     attributes: ['hotelId','servicetitle_1','servicepre_1','servicetitle_2','servicepre_2',
-    'servicetitle_3','servicepre_3','canceltitle','cancelpolicy','childlivein','addbed',
+    'servicetitle_3','servicepre_3','cancellevel','canceltitle','cancelpolicy','childlivein','addbed',
     'userule_1','userule_2','userule_3','roomtypedesc_1','roomtypedesc_2'],
     where:{
       hotelId:hotelId,

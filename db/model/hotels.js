@@ -364,6 +364,10 @@ const hotel_service = sequelize.define('hotel_service', {
     allowNull:true,
     type: Sequelize.DATEONLY,
   },
+  cancellevel: {
+    allowNull:false,
+    type: Sequelize.INTEGER,
+  },
   canceltitle: {
     allowNull:true,
     type: Sequelize.STRING,
@@ -408,35 +412,35 @@ hotel_service.sync();
 //读取user_history_order表
 const user_history_order = sequelize.define('user_history_order', {
   account: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
   hotelId: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
   eid: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
   number: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.INTEGER,
   },
   totalPrice: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.INTEGER,
   },
   sdate: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.DATEONLY,
   },
   edate: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.DATEONLY,
   },
   orderState: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
 },{
