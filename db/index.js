@@ -2,7 +2,9 @@ const {Hotel,user_account_pwd,home_advertisement,adcode_moreinfo,
   user_lived_record,user_fav_record,hotel_room,room_state,hotel_service,
   user_history_order} = require('./model/hotels')
 const {Op} = require('sequelize')
+const Sequelize = require('sequelize')
 const moment = require('moment')
+const { min } = require('moment')
 //以下是对user_history_order表进行操作(获取用户的订单历史)
 async function user_history_order_getHistoryOrderByAccount(account) {
   return user_history_order.findAll({
@@ -31,24 +33,176 @@ async function hotel_service_getServiceByHotelId(hotelId) {
   })
 }
 
+//将yyyy-(m)m-dd转换成yyyy/mm/dd
+function changeDateFormate(date){
+  var year = ""
+  var month = ""
+  var day = ""
+  for(let i=0;i<date.length;){
+    if(date[i] == '-' && year.length != 0 && month.length != 0){
+      i++
+      for(;i<date.length && date[i] != '-';++i){
+        day += date[i]
+      }
+    }else if(date[i] == '-' && year.length != 0){
+      i++
+      for(;i<date.length && date[i] != '-';++i){
+        month += date[i]
+      }
+    }else{
+      year += date[i]
+      i++
+    }
+  }
+  if(month.length == 1){
+    month = '0' + month
+  }
+  return (year+'/'+month+'/'+day)
+}
+//以下是取消订单的处理，应该在room_state表中进行相应的操作,将房间的剩余数量进行增加
+async function room_state_updateAddRoomRemaining(hotelId,eid,sdate,edate,number){
+  const startDate = Date.parse(new Date(changeDateFormate(sdate)))
+  const endDate = Date.parse(new Date(changeDateFormate(edate)))
+
+  for(let i=startDate;i<endDate;){
+    const value = await room_state.findOne({
+      attributes: ['hotelId','eid','date','remaining','state','price'],
+      where:{
+        hotelId:hotelId,
+        eid:eid,
+        date:i
+      },
+      order:[
+        ['eid', 'DESC']
+      ],
+      raw: true,
+    })
+
+    var newState = ""
+    if(value.remaining+number <= 0){
+      newState = "无"
+    }else if(value.remaining+number == 1){
+      newState = "抢"
+    }else{
+      newState = "订"
+    }
+
+    const result = await room_state.update({
+      remaining: Sequelize.literal('remaining +' + number),
+      state:newState,
+    },{
+      where:{
+        hotelId:hotelId,
+        eid:eid,
+        date:i
+      },
+    })
+    
+    //下面对日期进行加一天
+    const tmp = new Date(i)
+    i = tmp.setDate(tmp.getDate()+1)
+  }
+}
+//以下是提交订单的处理，应该在room_state表中进行相应的操作,将房间的剩余数量进行缩减
+async function room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number){
+  const startDate = Date.parse(new Date(changeDateFormate(sdate)))
+  const endDate = Date.parse(new Date(changeDateFormate(edate)))
+
+  for(let i=startDate;i<endDate;){
+    const value = await room_state.findOne({
+      attributes: ['hotelId','eid','date','remaining','state','price'],
+      where:{
+        hotelId:hotelId,
+        eid:eid,
+        date:i
+      },
+      order:[
+        ['eid', 'DESC']
+      ],
+      raw: true,
+    })
+    var newState = ""
+    if(value.remaining-number <= 0){
+      newState = "无"
+    }else if(value.remaining-number == 1){
+      newState = "抢"
+    }else{
+      newState = "订"
+    }
+
+    const result = await room_state.update({
+      remaining: Sequelize.literal('remaining -' + number),
+      state:newState,
+    },{
+      where:{
+        hotelId:hotelId,
+        eid:eid,
+        date:i
+      },
+    })
+    
+    //下面对日期进行加一天
+    const tmp = new Date(i)
+    i = tmp.setDate(tmp.getDate()+1)
+  }
+}
 //以下是对room_state表进行操作(获取某个酒店 包含 指定日期的所有房间的部分数据)
 async function room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate) {
-  return room_state.findAll({
-    attributes: ['hotelId','eid','sdate','edate','remaining','state','price'],
-    where:{
-      hotelId:hotelId,
-      eid:eid,
-      sdate:{
-        [Op.lte]:sdate
+  const startDate = Date.parse(new Date(changeDateFormate(sdate)))
+  const endDate = Date.parse(new Date(changeDateFormate(edate)))
+
+  var count = 0
+  var priceList = []
+  var totalPrice = 0
+  var minRemaining = 20000
+  var finalState = "订"
+  for(let i=startDate;i<endDate;){
+    count++
+    const value = await room_state.findOne({
+      attributes: ['hotelId','eid','date','remaining','state','price'],
+      where:{
+        hotelId:hotelId,
+        eid:eid,
+        date:i
       },
-      edate:{
-        [Op.gte]:edate,
+      order:[
+        ['eid', 'DESC']
+      ],
+      raw: true,
+    })
+    //const result = JSON.parse(JSON.stringify(value))
+    if(value == null){
+      return null
+      break
+    }else{
+      totalPrice += value.price
+      priceList.push(value.price)
+      if(minRemaining>value.remaining){
+        minRemaining = value.remaining
       }
-    },
-    order:[
-      ['eid', 'DESC']
-    ]
-  })
+      if(finalState == "订"){
+        finalState = value.state
+      }else if(finalState == "抢" && value.state != "订"){
+        finalState = value.state
+      }else if(finalState == "无"){
+        //不做任何操作
+      }
+    }
+    //下面对日期进行加一天
+    const tmp = new Date(i)
+    i = tmp.setDate(tmp.getDate()+1)
+  }
+  return {
+    "hotelId":hotelId,
+    "eid":eid,
+    "sdate":sdate,
+    "edate":edate,
+    "remaining":minRemaining,
+    "state":finalState,
+    "price":priceList,
+    "totalPrice":totalPrice,
+    "avgPrice":(totalPrice/count).toFixed(0),
+  } 
 }
 //以下是对hotel_room表进行操作(获取某个酒店指定房间的信息)
 async function hotel_room_getRoomByHotelIdEid(hotelId,eid) {
@@ -257,6 +411,8 @@ module.exports = {
   hotel_room_getRoomByHotelIdEid,
   hotel_room_getAllRoomByHotelId,
 
+  room_state_updateAddRoomRemaining,
+  room_state_updateReduceRoomRemaining,
   room_state_getRoomInfoByHotelIdDate,
 
   hotel_service_getServiceByHotelId,

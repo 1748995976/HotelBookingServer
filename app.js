@@ -9,7 +9,7 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   user_lived_record_getAllByUserId,
   getLivedHotelsByUserID,getFavHotelsByUserID,
   hotel_room_getRoomByHotelIdEid,hotel_room_getAllRoomByHotelId,
-  room_state_getRoomInfoByHotelIdDate,
+  room_state_updateAddRoomRemaining,room_state_updateReduceRoomRemaining,room_state_getRoomInfoByHotelIdDate,
   hotel_service_getServiceByHotelId,
   user_history_order_getHistoryOrderByAccount} = require('./db')
 const bodyParser = require('koa-bodyparser')
@@ -50,8 +50,39 @@ router.get('/hotel_service/getServiceByHotelId/:hotelId', async (context) => {
     data: result
   }
 })
+//更新房间的数据，增加房间的剩余数量
+router.get('/room_state/updateAddRoomRemaining/:hotelId/:eid/:sdate/:edate/:number',async (context) => {
+  const hotelId = context.params.hotelId
+  const eid = context.params.eid
+  const sdate = context.params.sdate
+  const edate = context.params.edate
+  const number = context.params.number
+  var result = await room_state_updateAddRoomRemaining(hotelId,eid,sdate,edate,number)
 
-//获取指定酒店指定房间 包含 指定日期的数据
+  context.type = jsonMIME
+  
+  context.body = {
+    status: 0,
+    data: true
+  }
+})
+//更新房间的数据,减少房间的剩余数量
+router.get('/room_state/updateReduceRoomRemaining/:hotelId/:eid/:sdate/:edate/:number',async (context) => {
+  const hotelId = context.params.hotelId
+  const eid = context.params.eid
+  const sdate = context.params.sdate
+  const edate = context.params.edate
+  const number = context.params.number
+  var result = await room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number)
+
+  context.type = jsonMIME
+  
+  context.body = {
+    status: 0,
+    data: true
+  }
+})
+//获取指定酒店指定房间指定日期之间的数据
 router.get('/room_state/getRoomInfoByHotelIdEidDate/:hotelId/:eid/:sdate/:edate', async (context) => {
   const hotelId = context.params.hotelId
   const eid = context.params.eid

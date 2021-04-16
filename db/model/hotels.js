@@ -300,33 +300,33 @@ hotel_room.sync();
 //读取room_state表
 const room_state = sequelize.define('room_state', {
   hotelId: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
   eid: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
-  sdate: {
-    allowNull:true,
-    type: Sequelize.DATEONLY,
-  },
-  edate: {
-    allowNull:true,
+  date: {
+    allowNull:false,
     type: Sequelize.DATEONLY,
   },
   remaining: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.INTEGER,
   },
   state: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.STRING,
   },
   price: {
-    allowNull:true,
+    allowNull:false,
     type: Sequelize.INTEGER,
   },
+  isShow: {
+    allowNull:false,
+    type: Sequelize.INTEGER,
+  }
 },{
   timestamps: false,
   freezeTableName: true
