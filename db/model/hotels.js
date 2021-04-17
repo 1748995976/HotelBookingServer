@@ -5,6 +5,7 @@ const sequelize = new Sequelize('hotelbooking', 'root', '3714231999', {
   dialect: 'mysql',
   port: "3306",
   operatorsAliases: false,
+  timezone: "+08:00",
   pool: {
     max: 5,
     min: 0,
@@ -407,6 +408,11 @@ const hotel_service = sequelize.define('hotel_service', {
 hotel_service.sync();
 //读取user_history_order表
 const user_history_order = sequelize.define('user_history_order', {
+  orderId:{
+    allowNull:false,
+    primaryKey:true,
+    type: Sequelize.STRING,
+  },
   account: {
     allowNull:false,
     type: Sequelize.STRING,
@@ -455,6 +461,10 @@ const user_history_order = sequelize.define('user_history_order', {
     allowNull:false,
     type: Sequelize.INTEGER,
   },
+  cancelTime: {
+    allowNull:false,
+    type: Sequelize.DATE,
+  }
 },{
   timestamps: false,
   freezeTableName: true

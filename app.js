@@ -11,7 +11,11 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   hotel_room_getRoomByHotelIdEid,hotel_room_getAllRoomByHotelId,
   room_state_updateAddRoomRemaining,room_state_updateReduceRoomRemaining,room_state_getRoomInfoByHotelIdDate,
   hotel_service_getServiceByHotelId,
-  user_history_order_getHistoryOrderByAccount} = require('./db')
+  user_history_order_getHistoryOrderByAccount,
+  user_history_order_getOrderByOrderId,
+  user_history_order_addOrderByAccount,
+  user_history_order_deleteOrderByOrderId,
+  user_history_order_cancelOrderByOrderId} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
 //以下是自己添加的
@@ -26,7 +30,54 @@ const errorImgPath = "D:\\HotelBookingImages\\error.jpg"
 const adPath = "D:\\HotelBookingImages\\advertisement\\"
 //酒店图片所在的绝对路径
 const hotelsImg = "D:\\HotelBookingImages\\hotels\\"
+//取消指定订单
+router.get('/user_history_order/cancelOrderByOrderId/:orderId', async (context) => {
+  const orderId = context.params.orderId
+  var result = await user_history_order_cancelOrderByOrderId(orderId)
 
+  context.type = jsonMIME
+  context.body = {
+    status: 0,
+    data: true
+  }
+})
+//删除指定订单
+router.get('/user_history_order/deleteOrderByOrderId/:orderId', async (context) => {
+  const orderId = context.params.orderId
+  var result = await user_history_order_deleteOrderByOrderId(orderId)
+
+  context.type = jsonMIME
+  context.body = {
+    status: 0,
+    data: true
+  }
+})
+//增加指定用户的订单记录
+router.post('/user_history_order/addOrderByAccount', async (context) => {
+//   {
+//     "account": "111111",
+//     "hotelId": "9",
+//     "eid":"1",
+//     "number":1,
+//     "totalPrice":3,
+//     "sdate":"2021-5-21",
+//     "edate":"2021-5-22",
+//     "customerName":"牛鼓励",
+//     "customerPhone":"123456789",
+//     "arriveTime":"不知道",
+//     "cancellevel":0 这个是取消的等级
+// }
+  var request = context.request.body
+  var result = await user_history_order_addOrderByAccount(request.account,request.hotelId,request.eid,
+    request.number,request.totalPrice,request.sdate,request.edate,
+    request.customerName,request.customerPhone,request.arriveTime,request.cancellevel)
+
+  context.type = jsonMIME
+  context.response.body = {
+    status:0,
+    data:true
+  }
+})
 //获取指定用户的历史订单记录
 router.get('/user_history_order/getHistoryOrderByAccount/:account', async (context) => {
   const account = context.params.account

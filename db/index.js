@@ -4,15 +4,110 @@ const {Hotel,user_account_pwd,home_advertisement,adcode_moreinfo,
 const {Op} = require('sequelize')
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { min } = require('moment')
 //用户订单失效时间，用户当前是否可以删除订单，订单状态的更改等等，需要好好考虑
-//以下是对user_history_order表进行操作(修改用户的订单记录，修改订单的状态)
-//以下是对user_history_order表进行操作(表面上删除用户的订单记录)
-//以下是对user_history_order表进行操作(增加用户的订单记录)
+//以下是对user_history_order表进行操作(评价订单)
+
+//以下是对user_history_order表进行操作(取消订单),这里应该考虑一下怎么退钱
+async function user_history_order_cancelOrderByOrderId(orderId){
+  var orderData = await user_history_order.findOne({
+    attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
+    'orderState','customerName','customerPhone','arriveTime','isShow','cancelTime'],
+    where:{
+      orderId:orderId,
+    },
+    raw: true,
+  })
+  //这里应该是对时间是否过期的判断
+  const nowDate = new Date()
+  //根据判断的结果来决定是否可以取消订单
+  console.log(stopDate.toLocaleString())
+  if(nowDate < orderData.cancelTime && orderData.orderState == 2){
+    console.log("可取消")
+    const result = await user_history_order.update({
+      orderState: 3,
+    },{
+      where:{
+        orderId:orderId,
+      },
+    })
+    return true
+  }else{
+    console.log("不可取消")
+    return false
+  }
+}
+//以下是对user_history_order表进行操作(删除订单)
+async function user_history_order_deleteOrderByOrderId(orderId){
+  const result = await user_history_order.update({
+    isShow: 0,
+  },{
+    where:{
+      orderId:orderId,
+    },
+  })
+}
+//以下是对user_history_order表进行操作(增加用户的订单记录),这个函数里面应该接着调用修改房间状态的函数
+async function user_history_order_addOrderByAccount(account,hotelId,eid,
+  number,totalPrice,sdate,edate,customerName,customerPhone,arriveTime,cancellevel) {
+  const startDate = Date.parse(new Date(changeDateFormate(sdate)))
+  const endDate = Date.parse(new Date(changeDateFormate(edate)))
+  var myDate = new Date()
+  const year = myDate.getFullYear()+""
+  const month = myDate.getMonth()+1+""
+  const date = myDate.getDate()+""
+  const hour = myDate.getHours()+""
+  const minute = myDate.getMinutes()+""
+  const second = myDate.getSeconds()+""
+  const miSecond = myDate.getMilliseconds()+""
+  const orderId = account+year+month+date+hour+minute+second+miSecond
+  var cancelDate
+  if(cancellevel == 0){
+    cancelDate = new Date()
+  }else if(cancellevel == 1){
+    cancelDate = myDate.setMinutes(myDate.getMinutes()+15)
+  }else if(cancellevel == 2){
+    const startDate = new Date(changeDateFormate(sdate))
+    const stopDate = new Date(startDate.setDate(startDate.getDate()-1))
+    stopDate.setHours(18)
+    stopDate.setMinutes(0)
+    stopDate.setSeconds(0)
+    stopDate.setMilliseconds(0)
+    cancelDate = stopDate
+  }else{
+    cancelDate = new Date()
+  }
+  //const tmp = await room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number)
+  return user_history_order.create({
+    orderId:orderId,
+    account:account,
+    hotelId:hotelId,
+    eid:eid,
+    number:number,
+    totalPrice:totalPrice,
+    sdate:startDate,
+    edate:endDate,
+    orderState:2,//预订成功状态
+    customerName:customerName,
+    customerPhone:customerPhone,
+    arriveTime:arriveTime,
+    isShow:1,
+    cancelTime:cancelDate,
+  })
+}
+//以下是对user_history_order表进行操作(获取指定orderId的订单)
+async function user_history_order_getOrderByOrderId(orderId) {
+  return user_history_order.findOne({
+    attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
+    'orderState','customerName','customerPhone','arriveTime','isShow','cancelTime'],
+    where:{
+      orderId:orderId,
+    },
+  })
+}
 //以下是对user_history_order表进行操作(获取用户的订单历史，只获取用户可以看到的,isShow字段不可见)
 async function user_history_order_getHistoryOrderByAccount(account) {
   return user_history_order.findAll({
-    attributes: ['account','hotelId','eid','number','totalPrice','sdate','edate',
+    attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
     'orderState','customerName','customerPhone','arriveTime'],
     where:{
       account:account,
@@ -423,5 +518,9 @@ module.exports = {
 
   hotel_service_getServiceByHotelId,
 
-  user_history_order_getHistoryOrderByAccount
+  user_history_order_getHistoryOrderByAccount,
+  user_history_order_getOrderByOrderId,
+  user_history_order_addOrderByAccount,
+  user_history_order_deleteOrderByOrderId,
+  user_history_order_cancelOrderByOrderId
 }
