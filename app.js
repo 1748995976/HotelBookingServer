@@ -15,7 +15,8 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   user_history_order_getOrderByOrderId,
   user_history_order_addOrderByAccount,
   user_history_order_deleteOrderByOrderId,
-  user_history_order_cancelOrderByOrderId} = require('./db')
+  user_history_order_cancelOrderByOrderId,
+  user_history_order_evaOrderByOrderId} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
 //以下是自己添加的
@@ -30,6 +31,8 @@ const errorImgPath = "D:\\HotelBookingImages\\error.jpg"
 const adPath = "D:\\HotelBookingImages\\advertisement\\"
 //酒店图片所在的绝对路径
 const hotelsImg = "D:\\HotelBookingImages\\hotels\\"
+//评价指定订单
+
 //取消指定订单
 router.get('/user_history_order/cancelOrderByOrderId/:orderId', async (context) => {
   const orderId = context.params.orderId

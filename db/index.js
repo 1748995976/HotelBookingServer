@@ -5,9 +5,18 @@ const {Op} = require('sequelize')
 const Sequelize = require('sequelize')
 const moment = require('moment')
 //用户订单失效时间，用户当前是否可以删除订单，订单状态的更改等等，需要好好考虑
-//以下是对user_history_order表进行操作(评价订单)
-
-//以下是对user_history_order表进行操作(取消订单),这里应该考虑一下怎么退钱
+//订单状态由2->1的转变没有写
+//以下是对user_history_order表进行操作(评价订单1->0)
+async function user_history_order_evaOrderByOrderId(orderId){
+  const result = await user_history_order.update({
+    orderState: 0,
+  },{
+    where:{
+      orderId:orderId,
+    },
+  })
+}
+//以下是对user_history_order表进行操作(取消订单2->3),这里应该考虑一下怎么退钱
 async function user_history_order_cancelOrderByOrderId(orderId){
   var orderData = await user_history_order.findOne({
     attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
@@ -30,6 +39,8 @@ async function user_history_order_cancelOrderByOrderId(orderId){
         orderId:orderId,
       },
     })
+    //更新房间的数据
+    const tmp = await room_state_updateAddRoomRemaining(hotelId,eid,sdate,edate,number)
     return true
   }else{
     console.log("不可取消")
@@ -46,7 +57,7 @@ async function user_history_order_deleteOrderByOrderId(orderId){
     },
   })
 }
-//以下是对user_history_order表进行操作(增加用户的订单记录),这个函数里面应该接着调用修改房间状态的函数
+//以下是对user_history_order表进行操作(增加订单 ->2),这个函数里面应该接着调用修改房间状态的函数
 async function user_history_order_addOrderByAccount(account,hotelId,eid,
   number,totalPrice,sdate,edate,customerName,customerPhone,arriveTime,cancellevel) {
   const startDate = Date.parse(new Date(changeDateFormate(sdate)))
@@ -76,7 +87,8 @@ async function user_history_order_addOrderByAccount(account,hotelId,eid,
   }else{
     cancelDate = new Date()
   }
-  //const tmp = await room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number)
+  //更新房间的数据
+  const tmp = await room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number)
   return user_history_order.create({
     orderId:orderId,
     account:account,
@@ -522,5 +534,6 @@ module.exports = {
   user_history_order_getOrderByOrderId,
   user_history_order_addOrderByAccount,
   user_history_order_deleteOrderByOrderId,
-  user_history_order_cancelOrderByOrderId
+  user_history_order_cancelOrderByOrderId,
+  user_history_order_evaOrderByOrderId
 }
