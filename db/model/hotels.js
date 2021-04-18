@@ -11,6 +11,16 @@ const sequelize = new Sequelize('hotelbooking', 'root', '3714231999', {
     min: 0,
     acquire: 30000,
     idle: 10000
+  },
+  dialectOptions: {
+    dateStrings: true,
+    typeCast(field, next) {
+      // for reading from database
+      if (field.type === "DATETIME") {
+        return field.string();
+      }
+      return next();
+    }
   }
 });
 
@@ -433,6 +443,10 @@ const user_history_order = sequelize.define('user_history_order', {
     allowNull:false,
     type: Sequelize.INTEGER,
   },
+  priceList: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
   sdate: {
     allowNull:false,
     type: Sequelize.DATEONLY,
@@ -462,6 +476,10 @@ const user_history_order = sequelize.define('user_history_order', {
     type: Sequelize.INTEGER,
   },
   cancelTime: {
+    allowNull:false,
+    type: Sequelize.DATE,
+  },
+  payTime:{
     allowNull:false,
     type: Sequelize.DATE,
   }

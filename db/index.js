@@ -19,7 +19,7 @@ async function user_history_order_evaOrderByOrderId(orderId){
 //以下是对user_history_order表进行操作(取消订单2->3),这里应该考虑一下怎么退钱
 async function user_history_order_cancelOrderByOrderId(orderId){
   var orderData = await user_history_order.findOne({
-    attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
+    attributes: ['orderId','account','hotelId','eid','number','totalPrice','priceList','sdate','edate',
     'orderState','customerName','customerPhone','arriveTime','isShow','cancelTime'],
     where:{
       orderId:orderId,
@@ -73,7 +73,7 @@ async function user_history_order_addOrderByAccount(account,hotelId,eid,
   const orderId = account+year+month+date+hour+minute+second+miSecond
   var cancelDate
   if(cancellevel == 0){
-    cancelDate = new Date()
+    cancelDate = myDate
   }else if(cancellevel == 1){
     cancelDate = myDate.setMinutes(myDate.getMinutes()+15)
   }else if(cancellevel == 2){
@@ -85,17 +85,19 @@ async function user_history_order_addOrderByAccount(account,hotelId,eid,
     stopDate.setMilliseconds(0)
     cancelDate = stopDate
   }else{
-    cancelDate = new Date()
+    cancelDate = myDate
   }
   //更新房间的数据
-  const tmp = await room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number)
+  const finalTotalPrice = totalPrice*number
+  const priceList = await room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number)
   return user_history_order.create({
     orderId:orderId,
     account:account,
     hotelId:hotelId,
     eid:eid,
     number:number,
-    totalPrice:totalPrice,
+    totalPrice:finalTotalPrice,
+    priceList: priceList,
     sdate:startDate,
     edate:endDate,
     orderState:2,//预订成功状态
@@ -104,12 +106,13 @@ async function user_history_order_addOrderByAccount(account,hotelId,eid,
     arriveTime:arriveTime,
     isShow:1,
     cancelTime:cancelDate,
+    payTime:myDate
   })
 }
 //以下是对user_history_order表进行操作(获取指定orderId的订单)
 async function user_history_order_getOrderByOrderId(orderId) {
   return user_history_order.findOne({
-    attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
+    attributes: ['orderId','account','hotelId','eid','number','totalPrice','priceList','sdate','edate',
     'orderState','customerName','customerPhone','arriveTime','isShow','cancelTime'],
     where:{
       orderId:orderId,
@@ -119,8 +122,8 @@ async function user_history_order_getOrderByOrderId(orderId) {
 //以下是对user_history_order表进行操作(获取用户的订单历史，只获取用户可以看到的,isShow字段不可见)
 async function user_history_order_getHistoryOrderByAccount(account) {
   return user_history_order.findAll({
-    attributes: ['orderId','account','hotelId','eid','number','totalPrice','sdate','edate',
-    'orderState','customerName','customerPhone','arriveTime'],
+    attributes: ['orderId','account','hotelId','eid','number','totalPrice','priceList','sdate','edate',
+    'orderState','customerName','customerPhone','arriveTime','cancelTime','payTime'],
     where:{
       account:account,
       isShow:1,
@@ -220,6 +223,7 @@ async function room_state_updateAddRoomRemaining(hotelId,eid,sdate,edate,number)
 async function room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,number){
   const startDate = Date.parse(new Date(changeDateFormate(sdate)))
   const endDate = Date.parse(new Date(changeDateFormate(edate)))
+  var priceList = ""
 
   for(let i=startDate;i<endDate;){
     const value = await room_state.findOne({
@@ -234,6 +238,7 @@ async function room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,numb
       ],
       raw: true,
     })
+    priceList = priceList + value.price + " "
     var newState = ""
     if(value.remaining-number <= 0){
       newState = "无"
@@ -258,6 +263,8 @@ async function room_state_updateReduceRoomRemaining(hotelId,eid,sdate,edate,numb
     const tmp = new Date(i)
     i = tmp.setDate(tmp.getDate()+1)
   }
+  //priceList尾部必须有一个空格代表间隔
+  return priceList
 }
 //以下是对room_state表进行操作(获取某个酒店 包含 指定日期的所有房间的部分数据)
 async function room_state_getRoomInfoByHotelIdDate(hotelId,eid,sdate,edate) {
