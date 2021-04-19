@@ -41,7 +41,7 @@ router.get('/user_history_order/cancelOrderByOrderId/:orderId', async (context) 
   context.type = jsonMIME
   context.body = {
     status: 0,
-    data: true
+    data: result
   }
 })
 //删除指定订单

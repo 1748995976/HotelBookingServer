@@ -29,8 +29,7 @@ async function user_history_order_cancelOrderByOrderId(orderId){
   //这里应该是对时间是否过期的判断
   const nowDate = new Date()
   //根据判断的结果来决定是否可以取消订单
-  console.log(stopDate.toLocaleString())
-  if(nowDate < orderData.cancelTime && orderData.orderState == 2){
+  if(nowDate < new Date(orderData.cancelTime) && orderData.orderState == 2){
     console.log("可取消")
     const result = await user_history_order.update({
       orderState: 3,
@@ -40,7 +39,8 @@ async function user_history_order_cancelOrderByOrderId(orderId){
       },
     })
     //更新房间的数据
-    const tmp = await room_state_updateAddRoomRemaining(hotelId,eid,sdate,edate,number)
+    const tmp = await room_state_updateAddRoomRemaining(orderData.hotelId,
+      orderData.eid,orderData.sdate,orderData.edate,orderData.number)
     return true
   }else{
     console.log("不可取消")
