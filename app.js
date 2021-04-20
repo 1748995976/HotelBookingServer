@@ -16,7 +16,8 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   user_history_order_addOrderByAccount,
   user_history_order_deleteOrderByOrderId,
   user_history_order_cancelOrderByOrderId,
-  user_history_order_evaOrderByOrderId} = require('./db')
+  user_history_order_evaOrderByOrderId,
+  user_info_getInfoByAccount,getEvaluationByHotelId} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
 //以下是自己添加的
@@ -31,6 +32,49 @@ const errorImgPath = "D:\\HotelBookingImages\\error.jpg"
 const adPath = "D:\\HotelBookingImages\\advertisement\\"
 //酒店图片所在的绝对路径
 const hotelsImg = "D:\\HotelBookingImages\\hotels\\"
+// 用户头像所在的绝对路径
+const usersAvatar = "D:\\HotelBookingImages\\avatars\\"
+//获取用户头像
+router.get('/userAvatar/img/:path', async (context) => {
+  const path = context.params.path
+  context.type = jsonMIME
+  let filePath = usersAvatar + path + ".jpg"
+  let file = null
+
+  //readFileSync读取不到文件会异常
+  try{
+    file = fs.readFileSync(filePath);
+  } catch (error){
+    filePath = errorImgPath
+    file = fs.readFileSync(filePath)
+  }
+
+  let mimeType = mime.lookup(filePath); //读取图片文件类型
+  context.response.set('content-type', mimeType); //设置返回类型
+  context.response.body = file; 
+})
+//获取酒店的评价列表
+router.get('/getEvaluationByHotelId/:hotelId', async (context) => {
+  const hotelId = context.params.hotelId
+  var result = await getEvaluationByHotelId(hotelId)
+
+  context.type = jsonMIME
+  context.body = {
+    status: 0,
+    data: result
+  }
+})
+//获取指定用户的个人信息
+router.get('/user_info/getInfoByAccount/:account', async (context) => {
+  const account = context.params.account
+  var result = await user_info_getInfoByAccount(account)
+
+  context.type = jsonMIME
+  context.body = {
+    status: 0,
+    data: result
+  }
+})
 //评价指定订单
 
 //取消指定订单

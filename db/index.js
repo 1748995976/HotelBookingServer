@@ -1,9 +1,54 @@
 const {Hotel,user_account_pwd,home_advertisement,adcode_moreinfo,
   user_lived_record,user_fav_record,hotel_room,room_state,hotel_service,
-  user_history_order} = require('./model/hotels')
+  user_history_order,hotel_evaluation,
+  user_info} = require('./model/hotels')
 const {Op} = require('sequelize')
 const Sequelize = require('sequelize')
 const moment = require('moment')
+//以下是对user_info表和hotel_evaluation表进行操作，获取展示评价所需要的信息
+async function getEvaluationByHotelId(hotelId){
+  const evaluations = await hotel_evaluation.findAll({
+    attributes: ['hotelId','eid','account','score','evaluation','businessResponse',
+    'checkInDate','evaluateDate','anonymous'],
+    where:{
+      hotelId:hotelId,
+    },
+    order:[
+      ['evaluateDate', 'DESC'],['checkInDate', 'DESC']
+    ]
+  })
+  var result = []
+  for(let i=0;i<evaluations.length;i++){
+    const userInfo = await user_info_getInfoByAccount(evaluations[i].account)
+    const roomInfo = await hotel_room_getRoomByHotelIdEid(evaluations[i].hotelId,evaluations[i].eid)
+    const tmp = {
+      "account":userInfo.account,
+      "userName":userInfo.name,
+      "imgUrl":userInfo.avatar,
+      "hotelId":evaluations[i].hotelId,
+      "eid":evaluations[i].eid,
+      "roomName":roomInfo.roomname,
+      "score":evaluations[i].score,
+      "evaluation":evaluations[i].evaluation,
+      "businessResponse":evaluations[i].businessResponse,
+      "checkInDate":evaluations[i].checkInDate,
+      "evaluateDate":evaluations[i].evaluateDate,
+      "anonymous":evaluations[i].anonymous
+    }
+    result.push(tmp)
+  }
+  return result
+}
+//以下是对user_info表进行操作，获得用户的个人信息
+async function user_info_getInfoByAccount(account){
+  const result = await user_info.findOne({
+    attributes: ['account','avatar','name','sex','age','phone','location'],
+    where:{
+      account:account,
+    },
+  })
+  return result
+}
 //用户订单失效时间，用户当前是否可以删除订单，订单状态的更改等等，需要好好考虑
 //订单状态由2->1的转变没有写
 //以下是对user_history_order表进行操作(评价订单1->0)
@@ -542,5 +587,8 @@ module.exports = {
   user_history_order_addOrderByAccount,
   user_history_order_deleteOrderByOrderId,
   user_history_order_cancelOrderByOrderId,
-  user_history_order_evaOrderByOrderId
+  user_history_order_evaOrderByOrderId,
+
+  user_info_getInfoByAccount,
+  getEvaluationByHotelId
 }

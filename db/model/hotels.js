@@ -488,6 +488,86 @@ const user_history_order = sequelize.define('user_history_order', {
   freezeTableName: true
 })
 user_history_order.sync();
+// 读取hotel_evaluation表
+const hotel_evaluation = sequelize.define('hotel_evaluation', {
+  hotelId: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  eid: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  account: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  score: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  evaluation: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  businessResponse: {
+    allowNull:true,
+    type: Sequelize.STRING,
+  },
+  checkInDate: {
+    allowNull:false,
+    type: Sequelize.DATEONLY,
+  },
+  evaluateDate: {
+    allowNull:false,
+    type: Sequelize.DATEONLY,
+  },
+  anonymous: {
+    allowNull:false,
+    type: Sequelize.INTEGER,
+  },
+},{
+  timestamps: false,
+  freezeTableName: true
+})
+hotel_evaluation.sync();
+
+// 读取user_info表
+const user_info = sequelize.define('user_info', {
+  account: {
+    type: Sequelize.STRING,
+    unique: true,
+    primaryKey: true
+  },
+  avatar: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  name: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  sex: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  age: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  phone: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+  location: {
+    allowNull:false,
+    type: Sequelize.STRING,
+  },
+},{
+  timestamps: false,
+  freezeTableName: true
+})
+user_info.sync();
 
 
 
@@ -502,4 +582,6 @@ module.exports = {
   room_state,
   hotel_service,
   user_history_order,
+  hotel_evaluation,
+  user_info,
 }
