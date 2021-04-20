@@ -16,7 +16,7 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   user_history_order_addOrderByAccount,
   user_history_order_deleteOrderByOrderId,
   user_history_order_cancelOrderByOrderId,
-  user_history_order_evaOrderByOrderId,
+  user_history_order_evaluateOrder,
   user_info_getInfoByAccount,getEvaluationByHotelId} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
@@ -76,7 +76,16 @@ router.get('/user_info/getInfoByAccount/:account', async (context) => {
   }
 })
 //评价指定订单
-
+router.post('/user_history_order/evaluateOrder', async (context) => {
+    var request = context.request.body
+    var result = await user_history_order_evaluateOrder(request)
+    context.type = jsonMIME
+    context.response.body = {
+      status:0,
+      data:true
+    }
+    console.log(context.response.body)
+  })
 //取消指定订单
 router.get('/user_history_order/cancelOrderByOrderId/:orderId', async (context) => {
   const orderId = context.params.orderId

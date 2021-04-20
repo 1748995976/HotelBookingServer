@@ -51,14 +51,27 @@ async function user_info_getInfoByAccount(account){
 }
 //用户订单失效时间，用户当前是否可以删除订单，订单状态的更改等等，需要好好考虑
 //订单状态由2->1的转变没有写
-//以下是对user_history_order表进行操作(评价订单1->0)
-async function user_history_order_evaOrderByOrderId(orderId){
-  const result = await user_history_order.update({
+//以下是对user_history_order表进行操作(评价订单1->0)，并且增加hotel_evaluation中评价列表
+async function user_history_order_evaluateOrder(request){
+  const firstStep = await user_history_order.update({
     orderState: 0,
   },{
     where:{
-      orderId:orderId,
+      orderId:request.orderId,
     },
+  })
+  var myDate = new Date()
+  var sDate = new Date(changeDateFormate(request.checkInDate))
+  return await hotel_evaluation.create({
+    hotelId:request.hotelId,
+    eid:request.eid,
+    account:request.account,
+    score:request.score,
+    evaluation:request.evaluation,
+    businessResponse:null,
+    checkInDate:sDate,
+    evaluateDate:myDate,
+    anonymous:request.anonymous
   })
 }
 //以下是对user_history_order表进行操作(取消订单2->3),这里应该考虑一下怎么退钱
@@ -587,7 +600,7 @@ module.exports = {
   user_history_order_addOrderByAccount,
   user_history_order_deleteOrderByOrderId,
   user_history_order_cancelOrderByOrderId,
-  user_history_order_evaOrderByOrderId,
+  user_history_order_evaluateOrder,
 
   user_info_getInfoByAccount,
   getEvaluationByHotelId

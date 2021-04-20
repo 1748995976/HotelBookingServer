@@ -530,6 +530,7 @@ const hotel_evaluation = sequelize.define('hotel_evaluation', {
   timestamps: false,
   freezeTableName: true
 })
+hotel_evaluation.removeAttribute('id');
 hotel_evaluation.sync();
 
 // 读取user_info表
