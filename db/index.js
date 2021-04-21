@@ -39,6 +39,21 @@ async function getEvaluationByHotelId(hotelId){
   }
   return result
 }
+//以下是对user_info表进行操作，更新用户的个人信息
+async function user_info_updateInfoByAccount(request){
+  const result = await user_info.update({
+    name: request.name,
+    sex: request.sex,
+    age: request.age,
+    phone: request.phone,
+    location: request.location
+  },{
+    where:{
+      account:request.account,
+    },
+  })
+  return result
+}
 //以下是对user_info表进行操作，获得用户的个人信息
 async function user_info_getInfoByAccount(account){
   const result = await user_info.findOne({
@@ -603,5 +618,6 @@ module.exports = {
   user_history_order_evaluateOrder,
 
   user_info_getInfoByAccount,
+  user_info_updateInfoByAccount,
   getEvaluationByHotelId
 }

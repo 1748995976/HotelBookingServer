@@ -2,6 +2,7 @@ const Koa = require('koa')
 const app = new Koa()
 const Router = require('koa-router')
 const router = new Router()
+const multer = require('koa-multer')
 const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, deleteHotel, 
   user_account_pwd_getAllUsers,user_account_pwd_getUserByAccount,
   home_advertisement_getAll,
@@ -17,7 +18,8 @@ const { getAllHotels, getHotelById, getHotelByName, createHotel, updateHotel, de
   user_history_order_deleteOrderByOrderId,
   user_history_order_cancelOrderByOrderId,
   user_history_order_evaluateOrder,
-  user_info_getInfoByAccount,getEvaluationByHotelId} = require('./db')
+  user_info_getInfoByAccount,user_info_updateInfoByAccount,
+  getEvaluationByHotelId} = require('./db')
 const bodyParser = require('koa-bodyparser')
 const jsonMIME = 'application/json'
 //以下是自己添加的
@@ -34,6 +36,59 @@ const adPath = "D:\\HotelBookingImages\\advertisement\\"
 const hotelsImg = "D:\\HotelBookingImages\\hotels\\"
 // 用户头像所在的绝对路径
 const usersAvatar = "D:\\HotelBookingImages\\avatars\\"
+//创建文件夹
+var createFileDirectory = function(path) {
+  try {
+      //检测文件夹是否存在，不存在抛出错误
+      fs.accessSync(path);
+  } catch (error) {
+      //创建文件夹
+      fs.mkdirSync(path);
+  }
+}
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+      //先创建路径在保存
+      createFileDirectory(usersAvatar);
+      //指定文件保存路径
+      cb(null, usersAvatar);
+  },
+  filename: function(req, file, cb) {
+      // 将保存文件名设置为 时间戳 + 文件原始名，比如 151342376785-123.jpg
+      cb(null, file.originalname+".jpg");
+  }
+})
+var upload = multer({
+  storage: storage
+});
+//上传用户头像
+router.post('/postAvatar',upload.single('file'), async (context) => {
+  let avatar = context.request.file
+  if (avatar) {
+      fs.unlink(avatar.path, (e) => {
+          if (e) {
+              console.log('文件操作失败')
+              throw e;
+          } else
+              console.log('文件:' + avatar.path + '删除成功！');
+      });
+  }
+  context.response.body = {
+    status: 0,
+    data: true
+  }
+})
+//上传用户信息
+router.post('/user_info/updateInfoByAccount', async (context) => {
+
+  var request = context.request.body
+  var result = await user_info_updateInfoByAccount(request)
+  context.type = jsonMIME
+  context.response.body = {
+    status:0,
+    data:true
+  }
+})
 //获取用户头像
 router.get('/userAvatar/img/:path', async (context) => {
   const path = context.params.path
