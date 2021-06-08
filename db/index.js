@@ -619,5 +619,6 @@ module.exports = {
 
   user_info_getInfoByAccount,
   user_info_updateInfoByAccount,
+  
   getEvaluationByHotelId
 }
